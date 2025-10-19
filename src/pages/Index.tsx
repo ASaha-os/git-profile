@@ -1,4 +1,4 @@
-import { Github, Sparkles, TrendingUp, Code2, Zap } from "lucide-react";
+import { Github, Sparkles, TrendingUp, Code2, Zap, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useNavigate } from "react-router-dom";
@@ -79,8 +79,11 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
+      <footer className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground space-y-2">
         <p>Powered by Gemini AI • Secure GitHub OAuth • Built with React</p>
+        <p className="flex items-center justify-center gap-1">
+          Developed with <Heart className="h-4 w-4 text-red-500 fill-red-500 animate-pulse" /> by <span className="font-semibold text-foreground">Akash Saha</span>
+        </p>
       </footer>
     </div>
   );
