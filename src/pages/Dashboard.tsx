@@ -1,4 +1,5 @@
-import { Sparkles, LogOut, GitBranch, GitPullRequest, GitCommit, Users, Globe, Heart, Code, Lightbulb, ArrowRight } from "lucide-react";
+import React from "react";
+import { Sparkles, LogOut, GitBranch, GitPullRequest, GitCommit, Users, Globe, Heart, Code, Lightbulb, ArrowRight, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProfileCard } from "@/components/ProfileCard";
@@ -6,40 +7,39 @@ import { SkillBadge } from "@/components/SkillBadge";
 import { ProjectCard } from "@/components/ProjectCard";
 import { WorkflowStep } from "@/components/WorkflowStep";
 import { BenefitCard } from "@/components/BenefitCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useGitHubAnalysis } from "@/hooks/useGitHubAnalysis";
 
-// Mock data - will be replaced with real data from backend
-const mockData = {
-  username: "johndoe",
-  avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=johndoe",
-  analysis_type: "Expert" as const,
-  welcome_summary:
-    "You're an experienced full-stack developer with a strong focus on modern web technologies. Your repositories demonstrate consistent activity and a deep understanding of React, TypeScript, and cloud architecture. Your commitment to clean code and best practices is evident throughout your projects.",
-  top_skills: ["React", "TypeScript", "Node.js", "PostgreSQL", "AWS"],
-  project_recommendations: [
-    {
-      title: "shadcn/ui",
-      description:
-        "A collection of beautifully designed components built with Radix UI and Tailwind CSS. Perfect for enhancing your UI development skills.",
-      github_url: "https://github.com/shadcn/ui",
-    },
-    {
-      title: "tRPC",
-      description:
-        "End-to-end typesafe APIs with TypeScript. Great for building type-safe full-stack applications.",
-      github_url: "https://github.com/trpc/trpc",
-    },
-    {
-      title: "Prisma",
-      description:
-        "Next-generation ORM for Node.js and TypeScript. Ideal for database management in modern applications.",
-      github_url: "https://github.com/prisma/prisma",
-    },
-  ],
+// Fallback data for when analysis is loading or fails
+const fallbackData = {
+  username: "User",
+  avatar: "",
+  analysis_type: "Beginner" as const,
+  welcome_summary: "Welcome! We're analyzing your GitHub profile to provide personalized insights.",
+  top_skills: ["Loading..."],
+  project_recommendations: [],
 };
 
-const Dashboard = () => {
+const Loading = () => (
+  <div className="flex items-center justify-center h-screen">
+    <span className="text-sm">Loading...</span>
+  </div>
+);
+
+const Dashboard: React.FC = () => {
+  const { user, isLoading, isAuthenticated, logout } = useAuth0();
+  const { analysis, loading: analysisLoading, error: analysisError, refetch } = useGitHubAnalysis();
   const navigate = useNavigate();
+
+  if (isLoading) return <Loading />;
+  if (!isAuthenticated || !user) return <Navigate to="/" replace />;
+
+  // Use real analysis data or fallback
+  const displayData = analysis || fallbackData;
+  const username = displayData.username;
+  const avatar = displayData.avatar || (user.picture as string) || "";
+  const summary = displayData.welcome_summary;
 
   return (
     <div className="min-h-screen" style={{ background: "var(--gradient-hero)" }}>
@@ -56,7 +56,17 @@ const Dashboard = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate("/")}
+                onClick={refetch}
+                disabled={analysisLoading}
+                className="rounded-full"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${analysisLoading ? 'animate-spin' : ''}`} />
+                {analysisLoading ? 'Analyzing...' : 'Refresh Analysis'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => logout({ returnTo: window.location.origin })}
                 className="rounded-full"
               >
                 <LogOut className="h-4 w-4 mr-2" />
@@ -72,12 +82,45 @@ const Dashboard = () => {
         {/* Profile Section */}
         <section>
           <ProfileCard
-            username={mockData.username}
-            avatar={mockData.avatar}
-            summary={mockData.welcome_summary}
-            analysisType={mockData.analysis_type}
+            username={username}
+            avatar={avatar}
+            summary={summary}
+            analysisType={displayData.analysis_type}
           />
         </section>
+
+        {/* Analysis Status */}
+        {analysisLoading && (
+          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+            <div className="flex items-center gap-3">
+              <RefreshCw className="h-5 w-5 text-blue-600 animate-spin" />
+              <div>
+                <h3 className="font-semibold text-blue-800">Analyzing Your GitHub Profile</h3>
+                <p className="text-sm text-blue-600">Fetching repositories, analyzing languages, and generating insights...</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {analysisError && (
+          <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 text-red-600">⚠️</div>
+              <div>
+                <h3 className="font-semibold text-red-800">Analysis Failed</h3>
+                <p className="text-sm text-red-600">{analysisError}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={refetch}
+                  className="mt-2"
+                >
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Skills Section */}
         <section className="space-y-6 animate-fade-in" style={{ animationDelay: "200ms" }}>
@@ -88,7 +131,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            {mockData.top_skills.map((skill, index) => (
+            {displayData.top_skills.map((skill, index) => (
               <SkillBadge key={skill} skill={skill} index={index} />
             ))}
           </div>
@@ -103,7 +146,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockData.project_recommendations.map((project, index) => (
+            {displayData.project_recommendations.map((project, index) => (
               <ProjectCard
                 key={project.title}
                 title={project.title}
