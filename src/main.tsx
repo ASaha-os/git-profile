@@ -16,7 +16,7 @@ createRoot(document.getElementById("root") as HTMLElement).render(
     <Auth0Provider
       domain={domain}
       clientId={clientId}
-      authorizationParams={{ redirect_uri: "http://localhost:8080", scope: "openid profile email offline_access" }}
+      authorizationParams={{ redirect_uri: "https://git-profile-one.vercel.app/dashboard", scope: "openid profile email offline_access" }}
       useRefreshTokens={true}
       cacheLocation="localstorage"
     >
