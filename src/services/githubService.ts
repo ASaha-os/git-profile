@@ -1,9 +1,4 @@
-// src/services/githubService.ts
 
-// 1. ADD THIS LINE: Reads the API URL from your environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-// --- INTERFACES (No changes) ---
 interface GitHubUser {
   login: string;
   id: number;
@@ -49,8 +44,8 @@ interface ProfileAnalysis {
   }[];
 }
 
-// --- GITHUB SERVICE CLASS (No changes to most methods) ---
 export class GitHubService {
+  
   private static instance: GitHubService;
   private githubToken: string | null = null;
 
@@ -124,12 +119,11 @@ export class GitHubService {
     return allLanguages;
   }
 
-  // --- THIS IS THE MODIFIED FUNCTION ---
   async analyzeProfileWithGemini(username: string): Promise<ProfileAnalysis> {
     try {
       console.log(`Starting analysis for user: ${username}`);
       
-      // Fetch user data and repositories (Same as before)
+      // Fetch user data and repositories
       const [userData, repos, languages] = await Promise.all([
         this.getUserData(username),
         this.getUserRepositories(username),
@@ -138,7 +132,7 @@ export class GitHubService {
 
       console.log('Fetched GitHub data:', { userData, reposCount: repos.length, languages });
 
-      // Prepare data for Gemini AI analysis (Same as before)
+      // Prepare data for Gemini AI analysis
       const analysisData = {
         user: {
           username: userData.login,
@@ -162,43 +156,19 @@ export class GitHubService {
         languages: languages
       };
 
-      // 2. REMOVED MOCK CALL:
-      // const analysis = this.createMockAnalysis(analysisData);
+      // For now, we'll create a mock analysis based on the data
+      // In a real implementation, you would send this to Gemini AI API
+      const analysis = this.createMockAnalysis(analysisData);
       
-      // 3. ADDED REAL BACKEND CALL:
-      console.log('Sending data to backend for analysis at:', `${API_BASE_URL}/api/analyze`);
-      
-      const response = await fetch(`${API_BASE_URL}/api/analyze`, { // <-- CHECK YOUR BACKEND ENDPOINT
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(analysisData),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Backend API error response:', errorText);
-        throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
-      }
-
-      const analysis: ProfileAnalysis = await response.json();
-      
-      console.log('Generated analysis from backend:', analysis);
+      console.log('Generated analysis:', analysis);
       return analysis;
 
     } catch (error) {
       console.error('Error analyzing profile:', error);
-      // Check if error is an instance of Error to access message property
-      if (error instanceof Error) {
-        throw new Error(`Failed to analyze GitHub profile: ${error.message}`);
-      } else {
-        throw new Error('An unknown error occurred during profile analysis.');
-      }
+      throw new Error(`Failed to analyze GitHub profile: ${error.message}`);
     }
   }
 
-  // --- MOCK FUNCTIONS (No changes, left here just in case) ---
   private createMockAnalysis(data: any): ProfileAnalysis {
     const { user, repositories, languages } = data;
     
