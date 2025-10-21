@@ -1,3 +1,5 @@
+_THIS PROJECT RUNS ONLY ON LOCALHOST , PLEASE CLONE & RUN_
+
 # 🌟 GitProfile AI
 
 > 🔍 **Discover Your GitHub Identity** — Analyze, assess, and enhance your open-source journey with AI-powered insights.
@@ -8,7 +10,9 @@
 [![Auth0](https://img.shields.io/badge/Auth-Auth0-orange?logo=auth0)](https://auth0.com)
 [![GitHub API](https://img.shields.io/badge/Data-GitHub%20API-lightgrey?logo=github)](https://docs.github.com/en/rest)
 
+
 ---
+
 
 ## ✨ Features
 
@@ -69,7 +73,7 @@ npm run dev
 ```
 
 Vite will start your app on:  
-👉 **http://localhost:5173**
+👉 **http://localhost:8080**
 
 ---
 
@@ -104,6 +108,11 @@ git-profile/
 ├── package.json
 └── README.md
 ```
+## 🎥 Project Presentation
+
+[![GitProfile Presentation](./assets/gitprofile-presentation.png)](https://www.canva.com/design/DAG2PBrzI5I/2D9pQV0_hF35itxnkh3-WQ/view?utm_content=DAG2PBrzI5I&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hb3392018a2)
+> 📽️ *Click the image to view the full Canva presentation!*
+
 
 ---
 
@@ -147,7 +156,7 @@ Contributions are always welcome.
 
 ## 🧑‍💻 Author
 
-👋 Developed by **[Aritra Saha](https://github.com/ASaha-os)**  
+👋 Developed by **[Akash Saha](https://github.com/ASaha-os)**  
 > A passionate open-source contributor & MLH hacker ❤️
 
 ---
